@@ -82,7 +82,7 @@ function createWorkplace(roomsArray, svgObject){
     }
 
 }
-
+//check git some code
 
 /*function createMap(){
     var s = Snap('#svg');
