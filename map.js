@@ -6,7 +6,7 @@ function createMap() {
         fill: '#b1c9ed',
         id: 'room1',
         check: false,
-        workPlaces: ['I am array1!', 'iias']
+        workPlaces: [1, 2]
     });
 
     var room2 = s.rect(405, 0, 400, 400).attr({
@@ -15,10 +15,10 @@ function createMap() {
         fill: '#b1c9ed',
         id: 'room2',
         check: false,
-        workPlaces: ['I am array1!']
+        workPlaces: [1, 2]
     });
 
-    var rooms = { room1, room2};
+    var rooms = {room1, room2};
 
     document.getElementById('svg').addEventListener('click', function(e){
 
@@ -28,15 +28,20 @@ function createMap() {
 
     var buttonCreateWorkplace = document.getElementById('create-workplace');
     buttonCreateWorkplace.addEventListener('click', function(){createWorkplace(rooms, s)});
-
 }
 
 createMap();
 
 
-//Выделить комнату
+//Выбрать комнату
+/**
+ *
+ * @param {object} roomsArray
+ * @param {string} idRoom
+ */
 function selectRoom(roomsArray, idRoom){
-
+    var buttonCreateWorkplace = document.getElementById('create-workplace');
+    buttonCreateWorkplace.disabled = false;
      if(roomsArray[idRoom].attr('check') == 'false'){
         for (var key in roomsArray){
             roomsArray[key].attr({'fill': '#b1c9ed', 'check': false});
@@ -48,12 +53,18 @@ function selectRoom(roomsArray, idRoom){
     console.log(idRoom);
     console.log(roomsArray[idRoom].attr('fill'));
     console.log(roomsArray[idRoom].attr('check'));
-
 }
 
 
 
+
 //Создать рабочее место в комнате
+/**
+ *
+ * @param {object} roomsArray
+ * @param {object} svgObject
+ */
+
 function createWorkplace(roomsArray, svgObject){
     for (var key in roomsArray){
 
@@ -73,11 +84,11 @@ function createWorkplace(roomsArray, svgObject){
             //roomsArray[key].attr('workPlaces').append(newWorkPlace);
             console.log(countRoom);
 
-          /*  newWorkPlace.drag();
+            newWorkPlace.drag();
             var domWorkPlace = document.getElementById('workplace1');
             domWorkPlace.addEventListener('click', function(){
                 console.log('координаты');
-            })*/
+            })
         }
     }
 
