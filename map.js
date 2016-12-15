@@ -1,3 +1,6 @@
+//отвязать события от рабочих мест, привязать события выбора комнаты только к комнате
+//масштабирование карты, разедлить области на карту и на список сотрудников
+
 function createMap() {
     var s = Snap('#svg');
     var room1 = s.rect(0, 0, 400, 400).attr({
@@ -21,9 +24,10 @@ function createMap() {
     var rooms = {room1, room2};
 
     document.getElementById('svg').addEventListener('click', function(e){
-
         var idRoom = e.target.id;
-        selectRoom(rooms, idRoom);
+        if(idRoom.indexOf("room") != -1){
+            selectRoom(rooms, idRoom);
+        }
     })
 
     var buttonCreateWorkplace = document.getElementById('create-workplace');
@@ -31,7 +35,6 @@ function createMap() {
 }
 
 createMap();
-
 
 //Выбрать комнату
 /**
@@ -54,9 +57,6 @@ function selectRoom(roomsArray, idRoom){
     console.log(roomsArray[idRoom].attr('fill'));
     console.log(roomsArray[idRoom].attr('check'));
 }
-
-
-
 
 //Создать рабочее место в комнате
 /**
