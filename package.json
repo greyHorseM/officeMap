@@ -1,0 +1,24 @@
+{
+  "name": "office-map",
+  "version": "1.0.0",
+  "description": "tbd",
+  "main": "map.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./node_modules/browser-sync/bin/browser-sync.js start --server --files *.html *.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://githib.com/greyHorseM/officeMap.git"
+  },
+  "keywords": [
+    "svg",
+    "map",
+    "interactive"
+  ],
+  "author": "Marina Baydak",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.18.5"
+  }
+}
