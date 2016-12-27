@@ -32,9 +32,26 @@ function createMap() {
 
     var buttonCreateWorkplace = document.getElementById('create-workplace');
     buttonCreateWorkplace.addEventListener('click', function(){createWorkplace(rooms, s)});
+
+    // addWorkPlacetoRoom = function(idRoom, idWorkplace){
+    //     for (let key in rooms){
+    //         if (rooms[key])
+    //     }
+    // }
+
 }
 
 createMap();
+
+function createEmployeesList(){
+    let employees = [
+        {name: "Чук", room: room1, workplace: workplace1},
+        {name: "Гек", room: room1, workplace: workplace2},
+        {name: "Петька", room: room2, workplace: workplace1},
+        {name: "Иван Иванович", room: room2, workplace: workplace2}
+        ];
+
+}
 
 //Выбрать комнату
 /**
@@ -73,27 +90,38 @@ function createWorkplace(roomsArray, svgObject){
             var ypos = roomsArray[key].attr('y');
             console.log('x:' + xpos + ', ' + 'y:' + ypos);
 
+
             //создание рабочего места и добавление в объект
             var countRoom = roomsArray[key].attr('workPlaces').length;
             var newWorkPlace = svgObject.rect(xpos, ypos, 50, 50).attr({
                 stroke: '#123456',
-                fill: 'black',
+                fill: '#123456',
                 id: 'workplace1'
             });
 
             //roomsArray[key].attr('workPlaces').append(newWorkPlace);
             console.log(countRoom);
-
             newWorkPlace.drag();
+            newWorkPlace.drag(function (x, y) {
+                let pos = x+51;
+                console.log("I am "+pos);
+                if(pos > 400){
+                    newWorkPlace.undrag();
+                }
+
+            });
             var domWorkPlace = document.getElementById('workplace1');
             domWorkPlace.addEventListener('click', function(){
-                console.log('координаты');
+                console.log('тут нужны координаты');
             })
         }
     }
 
 }
-//check git some code 111111
+
+
+
+
 
 /*function createMap(){
     var s = Snap('#svg');
