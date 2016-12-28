@@ -21,7 +21,24 @@ function createMap() {
         workPlaces: [1, 2]
     });
 
-    var rooms = {room1, room2};
+    var room3 = s.rect(810, 0, 400, 400).attr({
+        stroke: '#123456',
+        strokeWidth: 5,
+        fill: '#b1c9ed',
+        id: 'room2',
+        check: false,
+        workPlaces: [1, 2]
+    });
+
+    var g = s.group(room1, room2, room3);
+    g.drag();
+   /* var gDom = document.getElementsByTagName('g');
+    gDom[0].addEventListener('wheel', function(e){scaleMin(g, e)});*/
+
+    var svg = document.getElementById('svg');
+    svg.addEventListener('wheel', function(e){scaleMin(g, e)});;
+
+    var rooms = {room1, room2, room3};
 
     document.getElementById('svg').addEventListener('click', function(e){
         var idRoom = e.target.id;
@@ -31,13 +48,24 @@ function createMap() {
     })
 
     var buttonCreateWorkplace = document.getElementById('create-workplace');
-    buttonCreateWorkplace.addEventListener('click', function(){createWorkplace(rooms, s)});
+    buttonCreateWorkplace.addEventListener('click', function(e){
+        createWorkplace(rooms, s);
+        //toCenterRoom(svg, rooms, e);
+    }
+        );
+
+    var buttonScaleMin = document.getElementById('scale-min');
+    buttonScaleMin.addEventListener('click', function(){scaleMin(g)});
+
+
 
     // addWorkPlacetoRoom = function(idRoom, idWorkplace){
     //     for (let key in rooms){
     //         if (rooms[key])
     //     }
     // }
+
+    //scaleMap();
 
 }
 
@@ -119,8 +147,38 @@ function createWorkplace(roomsArray, svgObject){
 
 }
 
+//масштабирование карты
+function scaleMap() {
+    var svg = document.getElementById('svg');
+    svg.addEventListener('wheel', function(){
+        svg.setAttribute('viewBox', "0 0 800 800");
+    })
+}
 
+function scaleMin(g, e){
+    //e.stopPropagation();
+    //event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
+    var myMatrix = new Snap.Matrix();
+    if (e.deltaY < 0){
+        myMatrix.scale(1.5,1.5);
+        g.animate({transform: myMatrix},300);
+    } else{
+        myMatrix.scale(0.5,0.5);
+        g.animate({transform: myMatrix},300);
+    }
+    e.preventDefault();
+}
 
+/*function toCenterRoom(svg, rooms, e){
+    console.log("I am func toCenterRoom");
+    var svgBounding = svg.getBBox();
+    var mapBounding = rooms.getBBox();
+    var targetBounding = e.target.getBBox();
+    var transformOriginX = targetBounding.x + targetBounding.width / 2;
+    var transformOriginY = targetBounding.y + targetBounding.height / 2;
+    svg.style.transformOrigin = (transformOriginX) + "px " + (transformOriginY) + "px";
+}
+*/
 
 
 /*function createMap(){

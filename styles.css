@@ -8,6 +8,6 @@ p{
     padding: 10px;
 }
 
-.map{
-
+.container{
+    display: flex;
 }
