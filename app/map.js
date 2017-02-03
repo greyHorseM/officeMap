@@ -3,73 +3,69 @@
 
 function createMap() {
     var s = Snap('#svg');
-    var room1 = s.rect(0, 0, 400, 400).attr({
-        stroke: '#123456',
-        strokeWidth: 5,
-        fill: '#b1c9ed',
-        id: 'room1',
-        check: false,
-        workPlaces: [1, 2]
-    });
 
-    var room2 = s.rect(405, 0, 400, 400).attr({
-        stroke: '#123456',
-        strokeWidth: 5,
-        fill: '#b1c9ed',
-        id: 'room2',
-        check: false,
-        workPlaces: [1, 2]
-    });
+    getRooms().then(function (rooms) {
+        rooms = rooms.map(createFigure(s));
+        var g = s.group(...rooms);
+        var [room1, room2, room3] = rooms;
 
-    var room3 = s.rect(810, 0, 400, 400).attr({
-        stroke: '#123456',
-        strokeWidth: 5,
-        fill: '#b1c9ed',
-        id: 'room2',
-        check: false,
-        workPlaces: [1, 2]
-    });
+        g.drag();
+        /* var gDom = document.getElementsByTagName('g');
+         gDom[0].addEventListener('wheel', function(e){scaleMin(g, e)});*/
 
-    var g = s.group(room1, room2, room3);
-    g.drag();
-   /* var gDom = document.getElementsByTagName('g');
-    gDom[0].addEventListener('wheel', function(e){scaleMin(g, e)});*/
+        var svg = document.getElementById('svg');
+        svg.addEventListener('wheel', function(e){scaleMin(g, e)});;
 
-    var svg = document.getElementById('svg');
-    svg.addEventListener('wheel', function(e){scaleMin(g, e)});;
+        rooms = {room1, room2, room3};
 
-    var rooms = {room1, room2, room3};
+        document.getElementById('svg').addEventListener('click', function(e){
+            var idRoom = e.target.id;
+            if(idRoom.indexOf("room") != -1){
+                selectRoom(rooms, idRoom);
+            }
+        });
 
-    document.getElementById('svg').addEventListener('click', function(e){
-        var idRoom = e.target.id;
-        if(idRoom.indexOf("room") != -1){
-            selectRoom(rooms, idRoom);
-        }
-    })
-
-    var buttonCreateWorkplace = document.getElementById('create-workplace');
-    buttonCreateWorkplace.addEventListener('click', function(e){
-        createWorkplace(rooms, s);
-        //toCenterRoom(svg, rooms, e);
-    }
+        var buttonCreateWorkplace = document.getElementById('create-workplace');
+        buttonCreateWorkplace.addEventListener('click', function(e){
+              createWorkplace(rooms, s);
+              //toCenterRoom(svg, rooms, e);
+          }
         );
 
-    var buttonScaleMin = document.getElementById('scale-min');
-    buttonScaleMin.addEventListener('click', function(){scaleMin(g)});
+        var buttonScaleMin = document.getElementById('scale-min');
+        buttonScaleMin.addEventListener('click', function(){scaleMin(g)});
 
 
 
-    // addWorkPlacetoRoom = function(idRoom, idWorkplace){
-    //     for (let key in rooms){
-    //         if (rooms[key])
-    //     }
-    // }
+        // addWorkPlacetoRoom = function(idRoom, idWorkplace){
+        //     for (let key in rooms){
+        //         if (rooms[key])
+        //     }
+        // }
 
-    //scaleMap();
-
+        //scaleMap();
+    });
 }
 
 createMap();
+
+function getRooms() {
+    return fetch('/rooms').then(data => data.json());
+}
+
+function createFigure(canvas){
+    return ({id, workPlaces, coords}) => {
+        var {leftTop, rightDown} = coords;
+        return canvas.rect(leftTop.x, leftTop.y, rightDown.x, rightDown.y).attr({
+            stroke: '#123456',
+            strokeWidth: 5,
+            fill: '#b1c9ed',
+            id,
+            check: false,
+            workPlaces
+        });
+    };
+}
 
 function createEmployeesList(){
     let employees = [
