@@ -37,8 +37,9 @@ function createMap() {
 createMap();
 
 function getRooms() {
-    return fetch('/rooms').then(data => data.json(), function(){
-        console.log("Данные c сервера получить не удалось");
+    return fetch('/rooms')
+        .then(data => data.json(), function(){
+        console.log("Данные c сервера получить не удалось.");
     });
 }
 

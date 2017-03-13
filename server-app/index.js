@@ -1,6 +1,9 @@
-const express = require('express');
-const serveStatic = require('serve-static');
-const app = express();
+var express = require('express');
+//const serveStatic = require('serve-static');
+var app = express();
+var http = require("http");
+var path = require("path");
+var server = http.createServer(app);
 
 // respond with "hello world" when a GET request is made to the homepage
 app
@@ -65,7 +68,11 @@ app
       }
     ])
   })
-  .use(serveStatic('./app'))
-;
+    .get('/',function(req, res){
+      res.sendFile(path.join(__dirname + '/../public/index.html'));
+    })
+    .use(express.static('public'));
 
-app.listen(9000);
+server.listen(9000, function(){
+  console.log("Simple magic happens on port 9000");
+});
