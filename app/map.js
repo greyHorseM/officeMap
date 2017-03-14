@@ -1,11 +1,12 @@
     //отвязать события от рабочих мест, привязать события выбора комнаты только к комнате
     //масштабирование карты, разедлить области на карту и на список сотрудников
-import template from 'template.pug';
+import template from './template.pug';
 
     function createMap() {
         var s = Snap('#svg');
 
         getRooms().then(function (rooms) {
+            console.log(rooms);
             rooms = rooms.map(createFigure(s));
             var g = s.group(...rooms);
             var [room1, room2, room3] = rooms;
@@ -59,14 +60,12 @@ import template from 'template.pug';
     }
 
     function getEmployees(){
-        return fetch('/users').then(function(data){
-            data.json();
-        }.catch(function(){
+        return fetch('/users').then(data =>data.json(), function(){
             console.log("Данные пользователей получить не удалось.");
-        }));
+        });
     }
 
-    function renderEmployeesList({employees}){
+    function renderEmployeesList(employees){
         let tmp = document.createElement('div');
         tmp.innerHTML = template({
             items: employees
@@ -78,10 +77,13 @@ import template from 'template.pug';
     function createEmployeesList(){
         getEmployees().then(function (employees) {
             let ul = renderEmployeesList(employees);
-            let div = document.querySelector("list");
+            let div = document.querySelector(".list");
+            console.log(div);
             div.append(ul);
         })
     }
+
+    createEmployeesList();
 
     //Выбрать комнату
     /**
