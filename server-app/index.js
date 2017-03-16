@@ -11,11 +11,13 @@ app
     res.send([
       {
         id: 1,
-        name: 'Vasya'
+        name: 'Vasya',
+        projectName: 'project1'
       },
       {
         id: 2,
-        name: 'Petya'
+        name: 'Petya',
+        projectName: 'project2'
       }
     ]);
   })
@@ -67,7 +69,19 @@ app
         name: 'Tretiya komnata'
       }
     ])
-  })
+  }).get('/workplaces', function(req, res){
+    res.send([
+        {
+          id: 1,
+          roomId: 1,
+          userId: 1
+        },
+        {
+          id: 2,
+          roomId: 1,
+          userId: 2
+      }])
+})
     .get('/',function(req, res){
       res.sendFile(path.join(__dirname + '/../public/index.html'));
     })

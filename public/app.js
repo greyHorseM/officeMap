@@ -63,14 +63,317 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+    //отвязать события от рабочих мест, привязать события выбора комнаты только к комнате
+    //масштабирование карты, разедлить области на карту и на список сотрудников
+
+class Map {
+    constructor(promiseRooms){
+        this.promiseRooms = promiseRooms;
+        this.createMap = this.createMap.bind(this);
+        this.createMap(this.promiseRooms);
+        console.log("map constructor is running...");
+        this.rooms =[];
+    }
+
+    createMap(promiseRooms) {
+        var s = Snap('#svg');
+
+        promiseRooms().then((rooms) => {
+            rooms = rooms.map(this.createFigure(s));
+
+            var g = s.group(...rooms);
+            var [room1, room2, room3] = rooms;
+
+
+            g.drag();
+
+            var svg = document.getElementById('svg');
+            svg.addEventListener('wheel', function (e) {
+                scaleMin(g, e)
+            });
+
+            rooms = {room1, room2, room3};
+                this.rooms = rooms;
+                console.log("this.rooms");
+                console.log(this.rooms);
+
+            this.selectRoom = this.selectRoom.bind(this);
+
+            document.querySelector('#svg').addEventListener('click', (e) => {
+                this.selectRoom(e);
+            });
+
+            var buttonCreateWorkplace = document.getElementById('create-workplace');
+            buttonCreateWorkplace.addEventListener('click', function (e) {
+                    createWorkplace(rooms, s);
+                }
+            );
+
+            var buttonScaleMin = document.getElementById('scale-min');
+            buttonScaleMin.addEventListener('click', function () {
+                scaleMin(g)
+            });
+        },
+        function(){console.log("Данные комнат получить не удалось");});
+    }
+
+    createFigure(canvas) {
+        return ({id, workPlaces, coords}) => {
+            var {leftTop, rightDown} = coords;
+            return canvas.rect(leftTop.x, leftTop.y, rightDown.x, rightDown.y).attr({
+                stroke: '#123456',
+                strokeWidth: 5,
+                fill: '#b1c9ed',
+                id,
+                check: false,
+                workPlaces
+            });
+        };
+    }
+
+    //Выбрать комнату
+    /**
+     *
+     * @param {object} roomsArray
+     * @param {string} idRoom
+     */
+    selectRoom(e) {
+        var idRoom = e.target.id;
+        var buttonCreateWorkplace = document.getElementById('create-workplace');
+        buttonCreateWorkplace.disabled = false;
+        console.log('this.rooms[idRoom]')
+        console.log(this.rooms[idRoom]);
+        if (this.rooms[idRoom].attr('check') == 'false') {
+            for (var key in this.rooms) {
+                this.rooms[key].attr({'fill': '#b1c9ed', 'check': false});
+            }
+            this.rooms[idRoom].attr({
+                'fill': '#b1edc9',
+                'check': true
+            });
+        }
+
+        console.log(idRoom);
+        console.log(this.rooms[idRoom].attr('fill'));
+        console.log(this.rooms[idRoom].attr('check'));
+    }
+
+    //Создать рабочее место в комнате
+    /**
+     *
+     * @param {object} roomsArray
+     * @param {object} svgObject
+     */
+
+    createWorkplace(roomsArray, svgObject) {
+        for (var key in roomsArray) {
+
+            if (roomsArray[key].attr('check') == 'true') {
+                var xpos = roomsArray[key].attr('x');
+                var ypos = roomsArray[key].attr('y');
+                console.log('x:' + xpos + ', ' + 'y:' + ypos);
+
+
+                //создание рабочего места и добавление в объект
+                var countRoom = roomsArray[key].attr('workPlaces').length;
+                var newWorkPlace = svgObject.rect(xpos, ypos, 50, 50).attr({
+                    stroke: '#123456',
+                    fill: '#123456',
+                    id: 'workplace1'
+                });
+
+                //roomsArray[key].attr('workPlaces').append(newWorkPlace);
+                console.log(countRoom);
+                newWorkPlace.drag();
+                newWorkPlace.drag(function (x, y) {
+                    let pos = x + 51;
+                    console.log("I am " + pos);
+                    if (pos > 400) {
+                        newWorkPlace.undrag();
+                    }
+
+                });
+                var domWorkPlace = document.getElementById('workplace1');
+                domWorkPlace.addEventListener('click', function () {
+                    console.log('тут нужны координаты');
+                })
+            }
+        }
+
+    }
+
+    //масштабирование карты
+    scaleMap() {
+        var svg = document.getElementById('svg');
+        svg.addEventListener('wheel', function () {
+            svg.setAttribute('viewBox', "0 0 800 800");
+        })
+    }
+
+    scaleMin(g, e) {
+        //e.stopPropagation();
+        //event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
+        var myMatrix = new Snap.Matrix();
+        if (e.deltaY < 0) {
+            myMatrix.scale(1.5, 1.5);
+            g.animate({transform: myMatrix}, 300);
+        } else {
+            myMatrix.scale(0.5, 0.5);
+            g.animate({transform: myMatrix}, 300);
+        }
+        e.preventDefault();
+    }
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Map;
+
+    /*function toCenterRoom(svg, rooms, e){
+        console.log("I am func toCenterRoom");
+        var svgBounding = svg.getBBox();
+        var mapBounding = rooms.getBBox();
+        var targetBounding = e.target.getBBox();
+        var transformOriginX = targetBounding.x + targetBounding.width / 2;
+        var transformOriginY = targetBounding.y + targetBounding.height / 2;
+        svg.style.transformOrigin = (transformOriginX) + "px " + (transformOriginY) + "px";
+    }
+    */
+
+
+    /*function createMap(){
+        var s = Snap('#svg');
+        var room1 = s.rect(0,0,100,100).
+                    attr({
+                        stroke: '#123456',
+                        strokeWidth: 5,
+                        fill: 'blue',
+                        opacity: 0.2});
+
+        var room2 = s.rect(105,0,100,100).
+                    attr({
+                        stroke: '#123456',
+                        strokeWidth: 5,
+                        fill: 'blue',
+                        opacity: 0.2});
+
+
+
+        var titleR1 = Snap.parse('<title>Комната 1</title>');
+        room1.append(titleR1);
+
+        var titleR2 = Snap.parse('<title>Комната 2</title>');
+        room2.append(titleR2);
+
+
+        //
+        var move = function(dx,dy) {
+            this.attr({
+                transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
+            });
+            var coord = '' + dx + dy;
+            console.log(coord);
+
+        }
+
+        var start = function() {
+            this.data('origTransform', this.transform().local );
+        }
+        var stop = function() {
+            console.log('finished dragging');
+        }
+
+        room1.drag(move, start, stop );
+        room2.drag(move, start, stop );
+        //
+
+
+
+       /* var component = document.querySelector('#svg');
+        component.append(s);*/
+
+       //nextStep ассоциировать квадраты с элементом списка
+    /*    var arrayRoom = {
+         'employee1': room1,
+         'employee2': room2
+        };*/
+
+
+
+    /*    document.getElementById("employees").addEventListener("click", function(e){
+            if (e.target && e.target.nodeName == "LI"){
+                console.log("List item ", e.target.id.replace("post-", ""), " was clicked!");
+                //var room = arrayRoom[e.target.id];
+
+                arrayRoom[e.target.id].attr('fill', 'green');
+                //room.attr('fill', 'green');
+
+
+            }
+        });
+
+
+
+        alert(1);
+    }*/
+
+    /*function seeRoom(room1){
+        room1.click(function() {
+            this.attr('fill', 'green')
+        });
+    }*/
+
+    /*createMap();*/
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__template_pug__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__template_pug___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__template_pug__);
+
+
+class Users{
+    constructor(employees){
+        this.employess = employees;
+    }
+
+    renderEmployeesList(){
+        let tmp = document.createElement('div');
+        tmp.innerHTML = __WEBPACK_IMPORTED_MODULE_0__template_pug___default()({
+            items: this.employees
+        });
+        let employeesList = tmp.firstElementChild;
+        return employeesList;
+    }
+
+    getElem(){
+        this.getEmployees().then(function (employees) {
+            let ul = this.renderEmployeesList(employees);
+            this.div = document.querySelector(".list");
+            console.log(this.div);
+            this.div.append(ul);
+            return this.div;
+        })
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Users;
+
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var pug = __webpack_require__(1);
+var pug = __webpack_require__(3);
 
 function template(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (items) {pug_html = pug_html + "\u003Cul id=\"users-list\"\u003E";
 // iterate items
@@ -95,7 +398,7 @@ pug_html = pug_html + "\u003C\u002Ful\u003E";}.call(this,"items" in locals_for_w
 module.exports = template;
 
 /***/ }),
-/* 1 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -329,7 +632,7 @@ function pug_rethrow(err, filename, lineno, str){
     throw err;
   }
   try {
-    str = str || __webpack_require__(2).readFileSync(filename, 'utf8')
+    str = str || __webpack_require__(4).readFileSync(filename, 'utf8')
   } catch (ex) {
     pug_rethrow(err, null, lineno)
   }
@@ -356,289 +659,51 @@ function pug_rethrow(err, filename, lineno, str){
 
 
 /***/ }),
-/* 2 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /* (ignored) */
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__template_pug__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__template_pug___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__template_pug__);
-    //отвязать события от рабочих мест, привязать события выбора комнаты только к комнате
-    //масштабирование карты, разедлить области на карту и на список сотрудников
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__users_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__map_js__ = __webpack_require__(0);
 
 
-    function createMap() {
-        var s = Snap('#svg');
 
-        getRooms().then(function (rooms) {
-            console.log(rooms);
-            rooms = rooms.map(createFigure(s));
-            var g = s.group(...rooms);
-            var [room1, room2, room3] = rooms;
+class App{
+    constructor() {
+        let users = new __WEBPACK_IMPORTED_MODULE_0__users_js__["a" /* default */]();
 
-            g.drag();
+        this.getRooms = this.getRooms.bind(this);
+        let promiseRooms = this.getRooms;
+        let map = new __WEBPACK_IMPORTED_MODULE_1__map_js__["a" /* default */](promiseRooms);
 
-            var svg = document.getElementById('svg');
-            svg.addEventListener('wheel', function(e){scaleMin(g, e)});;
+        let div = document.querySelector('.container');
+        div.append(map);
 
-            rooms = {room1, room2, room3};
+    }
 
-            document.getElementById('svg').addEventListener('click', function(e){
-                var idRoom = e.target.id;
-                if(idRoom.indexOf("room") != -1){
-                    selectRoom(rooms, idRoom);
-                }
-            });
-
-            var buttonCreateWorkplace = document.getElementById('create-workplace');
-            buttonCreateWorkplace.addEventListener('click', function(e){
-                  createWorkplace(rooms, s);
-              }
-            );
-
-            var buttonScaleMin = document.getElementById('scale-min');
-            buttonScaleMin.addEventListener('click', function(){scaleMin(g)});
+    getEmployees(){
+        return fetch('/users')
+            .then(data =>data.json(), function(){
+            console.log("Данные пользователей с сервера получить не удалось.");
         });
     }
 
-    createMap();
-
-    function getRooms() {
+     getRooms(){
         return fetch('/rooms')
             .then(data => data.json(), function(){
-            console.log("Данные комнат c сервера получить не удалось.");
-        });
-    }
-
-    function createFigure(canvas){
-        return ({id, workPlaces, coords}) => {
-            var {leftTop, rightDown} = coords;
-            return canvas.rect(leftTop.x, leftTop.y, rightDown.x, rightDown.y).attr({
-                stroke: '#123456',
-                strokeWidth: 5,
-                fill: '#b1c9ed',
-                id,
-                check: false,
-                workPlaces
+                console.log("Данные комнат c сервера получить не удалось.");
             });
-        };
     }
+}
 
-    function getEmployees(){
-        return fetch('/users').then(data =>data.json(), function(){
-            console.log("Данные пользователей получить не удалось.");
-        });
-    }
-
-    function renderEmployeesList(employees){
-        let tmp = document.createElement('div');
-        tmp.innerHTML = __WEBPACK_IMPORTED_MODULE_0__template_pug___default()({
-            items: employees
-        });
-        let employeesList = tmp.firstElementChild;
-        return employeesList;
-    }
-
-    function createEmployeesList(){
-        getEmployees().then(function (employees) {
-            let ul = renderEmployeesList(employees);
-            let div = document.querySelector(".list");
-            console.log(div);
-            div.append(ul);
-        })
-    }
-
-    createEmployeesList();
-
-    //Выбрать комнату
-    /**
-     *
-     * @param {object} roomsArray
-     * @param {string} idRoom
-     */
-    function selectRoom(roomsArray, idRoom){
-        var buttonCreateWorkplace = document.getElementById('create-workplace');
-        buttonCreateWorkplace.disabled = false;
-         if(roomsArray[idRoom].attr('check') == 'false'){
-            for (var key in roomsArray){
-                roomsArray[key].attr({'fill': '#b1c9ed', 'check': false});
-            }
-            roomsArray[idRoom].attr({'fill': '#b1edc9',
-        'check': true});
-        }
-
-        console.log(idRoom);
-        console.log(roomsArray[idRoom].attr('fill'));
-        console.log(roomsArray[idRoom].attr('check'));
-    }
-
-    //Создать рабочее место в комнате
-    /**
-     *
-     * @param {object} roomsArray
-     * @param {object} svgObject
-     */
-
-    function createWorkplace(roomsArray, svgObject){
-        for (var key in roomsArray){
-
-            if (roomsArray[key].attr('check') == 'true'){
-                var xpos = roomsArray[key].attr('x');
-                var ypos = roomsArray[key].attr('y');
-                console.log('x:' + xpos + ', ' + 'y:' + ypos);
-
-
-                //создание рабочего места и добавление в объект
-                var countRoom = roomsArray[key].attr('workPlaces').length;
-                var newWorkPlace = svgObject.rect(xpos, ypos, 50, 50).attr({
-                    stroke: '#123456',
-                    fill: '#123456',
-                    id: 'workplace1'
-                });
-
-                //roomsArray[key].attr('workPlaces').append(newWorkPlace);
-                console.log(countRoom);
-                newWorkPlace.drag();
-                newWorkPlace.drag(function (x, y) {
-                    let pos = x+51;
-                    console.log("I am "+pos);
-                    if(pos > 400){
-                        newWorkPlace.undrag();
-                    }
-
-                });
-                var domWorkPlace = document.getElementById('workplace1');
-                domWorkPlace.addEventListener('click', function(){
-                    console.log('тут нужны координаты');
-                })
-            }
-        }
-
-    }
-
-    //масштабирование карты
-    function scaleMap() {
-        var svg = document.getElementById('svg');
-        svg.addEventListener('wheel', function(){
-            svg.setAttribute('viewBox', "0 0 800 800");
-        })
-    }
-
-    function scaleMin(g, e){
-        //e.stopPropagation();
-        //event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
-        var myMatrix = new Snap.Matrix();
-        if (e.deltaY < 0){
-            myMatrix.scale(1.5,1.5);
-            g.animate({transform: myMatrix},300);
-        } else{
-            myMatrix.scale(0.5,0.5);
-            g.animate({transform: myMatrix},300);
-        }
-        e.preventDefault();
-    }
-
-    /*function toCenterRoom(svg, rooms, e){
-        console.log("I am func toCenterRoom");
-        var svgBounding = svg.getBBox();
-        var mapBounding = rooms.getBBox();
-        var targetBounding = e.target.getBBox();
-        var transformOriginX = targetBounding.x + targetBounding.width / 2;
-        var transformOriginY = targetBounding.y + targetBounding.height / 2;
-        svg.style.transformOrigin = (transformOriginX) + "px " + (transformOriginY) + "px";
-    }
-    */
-
-
-    /*function createMap(){
-        var s = Snap('#svg');
-        var room1 = s.rect(0,0,100,100).
-                    attr({
-                        stroke: '#123456',
-                        strokeWidth: 5,
-                        fill: 'blue',
-                        opacity: 0.2});
-
-        var room2 = s.rect(105,0,100,100).
-                    attr({
-                        stroke: '#123456',
-                        strokeWidth: 5,
-                        fill: 'blue',
-                        opacity: 0.2});
-
-
-
-        var titleR1 = Snap.parse('<title>Комната 1</title>');
-        room1.append(titleR1);
-
-        var titleR2 = Snap.parse('<title>Комната 2</title>');
-        room2.append(titleR2);
-
-
-        //
-        var move = function(dx,dy) {
-            this.attr({
-                transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
-            });
-            var coord = '' + dx + dy;
-            console.log(coord);
-
-        }
-
-        var start = function() {
-            this.data('origTransform', this.transform().local );
-        }
-        var stop = function() {
-            console.log('finished dragging');
-        }
-
-        room1.drag(move, start, stop );
-        room2.drag(move, start, stop );
-        //
-
-
-
-       /* var component = document.querySelector('#svg');
-        component.append(s);*/
-
-       //nextStep ассоциировать квадраты с элементом списка
-    /*    var arrayRoom = {
-         'employee1': room1,
-         'employee2': room2
-        };*/
-
-
-
-    /*    document.getElementById("employees").addEventListener("click", function(e){
-            if (e.target && e.target.nodeName == "LI"){
-                console.log("List item ", e.target.id.replace("post-", ""), " was clicked!");
-                //var room = arrayRoom[e.target.id];
-
-                arrayRoom[e.target.id].attr('fill', 'green');
-                //room.attr('fill', 'green');
-
-
-            }
-        });
-
-
-
-        alert(1);
-    }*/
-
-    /*function seeRoom(room1){
-        room1.click(function() {
-            this.attr('fill', 'green')
-        });
-    }*/
-
-    /*createMap();*/
+let app = new App();
 
 
 /***/ })
