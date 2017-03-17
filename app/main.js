@@ -10,7 +10,6 @@ class App{
             divMap.append(map);
         });
 
-
         this.getEmployees().then((dataEmployees)=>{
         this.dataEmployees = dataEmployees;
         let employees = new Employees(this.dataEmployees);

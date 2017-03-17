@@ -15,7 +15,7 @@ export default class Map {
         var [room1, room2, room3] = this.rooms;
         g.drag();
         var svg = document.getElementById('svg');
-        svg.addEventListener('wheel', function (e) {
+        svg.addEventListener('wheel', (e) => {
             this.scaleMin(g, e);
             });
 
@@ -30,14 +30,14 @@ export default class Map {
             });
 
             var buttonCreateWorkplace = document.getElementById('create-workplace');
-            buttonCreateWorkplace.addEventListener('click', function (e) {
-                    createWorkplace(rooms, s);
+            buttonCreateWorkplace.addEventListener('click', (e) => {
+                    this.createWorkplace(this.rooms, s);
                 }
             );
 
             var buttonScaleMin = document.getElementById('scale-min');
-            buttonScaleMin.addEventListener('click', function () {
-                scaleMin(g)
+            buttonScaleMin.addEventListener('click', () => {
+                this.scaleMin(g);
             });
     }
 
