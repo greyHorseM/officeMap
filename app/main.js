@@ -1,17 +1,22 @@
-import Users from './users.js';
+import Employees from './users.js';
 import Map from './map.js';
 
 class App{
     constructor() {
-        let users = new Users();
+        this.getRooms().then((dataRooms)=>{
+            this.dataRooms = dataRooms;
+            let map = new Map(this.dataRooms);
+            let divMap = document.querySelector('.container');
+            divMap.append(map);
+        });
 
-        this.getRooms = this.getRooms.bind(this);
-        let promiseRooms = this.getRooms;
-        let map = new Map(promiseRooms);
 
-        let div = document.querySelector('.container');
-        div.append(map);
-
+        this.getEmployees().then((dataEmployees)=>{
+        this.dataEmployees = dataEmployees;
+        let employees = new Employees(this.dataEmployees);
+        let divEmployees = document.querySelector('.list');
+        divEmployees.append(employees);
+        });
     }
 
     getEmployees(){

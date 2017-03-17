@@ -75,35 +75,26 @@
     //масштабирование карты, разедлить области на карту и на список сотрудников
 
 class Map {
-    constructor(promiseRooms){
-        this.promiseRooms = promiseRooms;
-        this.createMap = this.createMap.bind(this);
-        this.createMap(this.promiseRooms);
+    constructor(rooms){
+        this.rooms = rooms;
+        this.createMap();
         console.log("map constructor is running...");
-        this.rooms =[];
     }
 
-    createMap(promiseRooms) {
+    createMap() {
         var s = Snap('#svg');
-
-        promiseRooms().then((rooms) => {
-            rooms = rooms.map(this.createFigure(s));
-
-            var g = s.group(...rooms);
-            var [room1, room2, room3] = rooms;
-
-
-            g.drag();
-
-            var svg = document.getElementById('svg');
-            svg.addEventListener('wheel', function (e) {
-                scaleMin(g, e)
+        this.rooms = this.rooms.map(this.createFigure(s));
+        var g = s.group(...this.rooms);
+        var [room1, room2, room3] = this.rooms;
+        g.drag();
+        var svg = document.getElementById('svg');
+        svg.addEventListener('wheel', function (e) {
+            this.scaleMin(g, e);
             });
 
-            rooms = {room1, room2, room3};
-                this.rooms = rooms;
-                console.log("this.rooms");
-                console.log(this.rooms);
+            this.rooms = {room1, room2, room3};
+            console.log("this.rooms");
+            console.log(this.rooms);
 
             this.selectRoom = this.selectRoom.bind(this);
 
@@ -121,9 +112,8 @@ class Map {
             buttonScaleMin.addEventListener('click', function () {
                 scaleMin(g)
             });
-        },
-        function(){console.log("Данные комнат получить не удалось");});
     }
+
 
     createFigure(canvas) {
         return ({id, workPlaces, coords}) => {
@@ -341,9 +331,13 @@ class Map {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__template_pug___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__template_pug__);
 
 
-class Users{
+class Employees{
     constructor(employees){
-        this.employess = employees;
+        this.employees = employees;
+        console.log("employees constructor is running");
+        console.log(this.employees);
+        this.elem = this.renderEmployeesList();
+        return this.elem;
     }
 
     renderEmployeesList(){
@@ -354,7 +348,7 @@ class Users{
         let employeesList = tmp.firstElementChild;
         return employeesList;
     }
-
+/*
     getElem(){
         this.getEmployees().then(function (employees) {
             let ul = this.renderEmployeesList(employees);
@@ -364,8 +358,9 @@ class Users{
             return this.div;
         })
     }
+    */
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Users;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Employees;
 
 
 
@@ -677,15 +672,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 class App{
     constructor() {
-        let users = new __WEBPACK_IMPORTED_MODULE_0__users_js__["a" /* default */]();
+        this.getRooms().then((dataRooms)=>{
+            this.dataRooms = dataRooms;
+            let map = new __WEBPACK_IMPORTED_MODULE_1__map_js__["a" /* default */](this.dataRooms);
+            let divMap = document.querySelector('.container');
+            divMap.append(map);
+        });
 
-        this.getRooms = this.getRooms.bind(this);
-        let promiseRooms = this.getRooms;
-        let map = new __WEBPACK_IMPORTED_MODULE_1__map_js__["a" /* default */](promiseRooms);
 
-        let div = document.querySelector('.container');
-        div.append(map);
-
+        this.getEmployees().then((dataEmployees)=>{
+        this.dataEmployees = dataEmployees;
+        let employees = new __WEBPACK_IMPORTED_MODULE_0__users_js__["a" /* default */](this.dataEmployees);
+        let divEmployees = document.querySelector('.list');
+        divEmployees.append(employees);
+        });
     }
 
     getEmployees(){

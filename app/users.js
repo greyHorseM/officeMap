@@ -1,8 +1,12 @@
 import template from './template.pug';
 
-export default class Users{
+export default class Employees{
     constructor(employees){
-        this.employess = employees;
+        this.employees = employees;
+        console.log("employees constructor is running");
+        console.log(this.employees);
+        this.elem = this.renderEmployeesList();
+        return this.elem;
     }
 
     renderEmployeesList(){
@@ -13,7 +17,7 @@ export default class Users{
         let employeesList = tmp.firstElementChild;
         return employeesList;
     }
-
+/*
     getElem(){
         this.getEmployees().then(function (employees) {
             let ul = this.renderEmployeesList(employees);
@@ -23,4 +27,5 @@ export default class Users{
             return this.div;
         })
     }
+    */
 }

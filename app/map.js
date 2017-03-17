@@ -2,33 +2,24 @@
     //масштабирование карты, разедлить области на карту и на список сотрудников
 
 export default class Map {
-    constructor(promiseRooms){
-        this.promiseRooms = promiseRooms;
-        this.createMap = this.createMap.bind(this);
-        this.createMap(this.promiseRooms);
+    constructor(rooms){
+        this.rooms = rooms;
+        this.createMap();
         console.log("map constructor is running...");
-        this.rooms =[];
     }
 
-    createMap(promiseRooms) {
+    createMap() {
         var s = Snap('#svg');
-
-        promiseRooms().then((rooms) => {
-            rooms = rooms.map(this.createFigure(s));
-
-            var g = s.group(...rooms);
-            var [room1, room2, room3] = rooms;
-
-
-            g.drag();
-
-            var svg = document.getElementById('svg');
-            svg.addEventListener('wheel', function (e) {
-                scaleMin(g, e)
+        this.rooms = this.rooms.map(this.createFigure(s));
+        var g = s.group(...this.rooms);
+        var [room1, room2, room3] = this.rooms;
+        g.drag();
+        var svg = document.getElementById('svg');
+        svg.addEventListener('wheel', function (e) {
+            this.scaleMin(g, e);
             });
 
-            rooms = {room1, room2, room3};
-            this.rooms = rooms;
+            this.rooms = {room1, room2, room3};
             console.log("this.rooms");
             console.log(this.rooms);
 
@@ -48,9 +39,8 @@ export default class Map {
             buttonScaleMin.addEventListener('click', function () {
                 scaleMin(g)
             });
-        },
-        function(){console.log("Данные комнат получить не удалось");});
     }
+
 
     createFigure(canvas) {
         return ({id, workPlaces, coords}) => {
