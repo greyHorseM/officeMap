@@ -36,7 +36,8 @@ app
           }
         },
         workPlaces: [1, 2],
-        name: 'Pervaya komnata'
+        name: 'Pervaya komnata',
+        svgObj: {}
       },
       {
         id: 'room2',
@@ -51,7 +52,8 @@ app
           }
         },
         workPlaces: [1, 2],
-        name: 'Vtoraya komnata'
+        name: 'Vtoraya komnata',
+        svgObj: {}
       },
       {
         id: 'room3',
@@ -66,18 +68,33 @@ app
           }
         },
         workPlaces: [1, 2],
-        name: 'Tretiya komnata'
+        name: 'Tretiya komnata',
+        svgObj: {}
       }
     ])
   }).get('/workplaces', function(req, res){
     res.send([
         {
           id: 1,
+          type: "workplace",
+          coords: {
+            leftTop: {
+            x: 0,
+            y: 0
+            }
+          },
           roomId: 1,
           userId: 1
         },
         {
           id: 2,
+          type: "workplace",
+          coords: {
+            leftTop: {
+              x: 100,
+              y: 100
+            }
+          },
           roomId: 1,
           userId: 2
       }])

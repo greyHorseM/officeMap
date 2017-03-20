@@ -77,19 +77,25 @@
 class Map {
     constructor(rooms){
         this.rooms = rooms;
-        this.createMap();
+        this.createRoom();
         console.log("map constructor is running...");
+        this.getWorkPlaces().then((dataWorkPlaces)=>{
+            console.log(dataWorkPlaces);
+            this.dataWorkPlaces = dataWorkPlaces;
+            this.renderWorkPlaces();
+        });
+        this.selectWorkPlace = this.selectWorkPlace.bind(this);
     }
 
-    createMap() {
-        var s = Snap('#svg');
-        this.rooms = this.rooms.map(this.createFigure(s));
-        var g = s.group(...this.rooms);
+    createRoom() {
+        this.s = Snap('#svg');
+        this.rooms = this.rooms.map(this.createFigure());
+        this.g = this.s.group(...this.rooms);
         var [room1, room2, room3] = this.rooms;
-        g.drag();
+        this.g.drag();
         var svg = document.getElementById('svg');
         svg.addEventListener('wheel', (e) => {
-            this.scaleMin(g, e);
+            this.scaleMin(e);
             });
 
             this.rooms = {room1, room2, room3};
@@ -104,7 +110,7 @@ class Map {
 
             var buttonCreateWorkplace = document.getElementById('create-workplace');
             buttonCreateWorkplace.addEventListener('click', (e) => {
-                    this.createWorkplace(this.rooms, s);
+                    this.createWorkplace(this.rooms, this.s);
                 }
             );
 
@@ -114,11 +120,21 @@ class Map {
             });
     }
 
+    renderWorkPlaces(){
+        for (let workPlace of this.dataWorkPlaces){
+            var newWorkPlace = this.s.rect(workPlace.coords.leftTop.x, workPlace.coords.leftTop.y, 50, 50).attr({
+                stroke: '#123456',
+                fill: '#123456'
+            });
+            newWorkPlace.drag();
+            console.log(""+workPlace.id+" rendered");
+        }
+    }
 
-    createFigure(canvas) {
+    createFigure() {
         return ({id, workPlaces, coords}) => {
             var {leftTop, rightDown} = coords;
-            return canvas.rect(leftTop.x, leftTop.y, rightDown.x, rightDown.y).attr({
+            return this.s.rect(leftTop.x, leftTop.y, rightDown.x, rightDown.y).attr({
                 stroke: '#123456',
                 strokeWidth: 5,
                 fill: '#b1c9ed',
@@ -137,6 +153,7 @@ class Map {
      */
     selectRoom(e) {
         var idRoom = e.target.id;
+        this.idRoom = idRoom;
         var buttonCreateWorkplace = document.getElementById('create-workplace');
         buttonCreateWorkplace.disabled = false;
         console.log('this.rooms[idRoom]')
@@ -163,41 +180,49 @@ class Map {
      * @param {object} svgObject
      */
 
-    createWorkplace(roomsArray, svgObject) {
-        for (var key in roomsArray) {
+    createWorkplace() {
+        var xpos = this.rooms[this.idRoom].attr('x');
+        var ypos = this.rooms[this.idRoom].attr('y');
+        console.log('x:' + xpos + ', ' + 'y:' + ypos);
 
-            if (roomsArray[key].attr('check') == 'true') {
-                var xpos = roomsArray[key].attr('x');
-                var ypos = roomsArray[key].attr('y');
-                console.log('x:' + xpos + ', ' + 'y:' + ypos);
-
-
-                //создание рабочего места и добавление в объект
-                var countRoom = roomsArray[key].attr('workPlaces').length;
-                var newWorkPlace = svgObject.rect(xpos, ypos, 50, 50).attr({
-                    stroke: '#123456',
-                    fill: '#123456',
-                    id: 'workplace1'
-                });
-
-                //roomsArray[key].attr('workPlaces').append(newWorkPlace);
-                console.log(countRoom);
-                newWorkPlace.drag();
-                newWorkPlace.drag(function (x, y) {
-                    let pos = x + 51;
-                    console.log("I am " + pos);
-                    if (pos > 400) {
-                        newWorkPlace.undrag();
-                    }
-
-                });
-                var domWorkPlace = document.getElementById('workplace1');
-                domWorkPlace.addEventListener('click', function () {
-                    console.log('тут нужны координаты');
-                })
+        //создание рабочего места и добавление в объект
+        var countRoom = this.rooms[this.idRoom].attr('workPlaces').length;
+        var newWorkPlace = this.s.rect(xpos, ypos, 50, 50).attr({
+            stroke: '#123456',
+            fill: '#123456',
+            id: 'workplace'+countRoom
+        });
+        //roomsArray[key].attr('workPlaces').append(newWorkPlace);
+        console.log(countRoom);
+        newWorkPlace.drag();
+        newWorkPlace.drag(function (x, y) {
+            let pos = x + 51;
+            console.log("I am " + pos);
+            if (pos > 400) {
+                newWorkPlace.undrag();
             }
-        }
+        });
+        var domWorkPlace = document.getElementById('workplace1');
+        domWorkPlace.addEventListener('click', function () {
+            console.log('тут нужны координаты');
+        });
+        this.addObjToGroup(newWorkPlace);
+        newWorkPlace.addEventListener('click', () => {this.selectWorkPlace(e)});
 
+    }
+
+    addObjToGroup(obj){
+        this.g.group(obj);
+    }
+
+    selectWorkPlace(e){
+        selectedWorkPlace = e.target.id;
+    }
+
+    //промис для получения рабочих мест
+    getWorkPlaces(){
+        return fetch('/workplaces')
+            .then(data => data.json(), function(){console.log("Данные рабочих мест получить не уадлось");})
     }
 
     //масштабирование карты
@@ -208,16 +233,16 @@ class Map {
         })
     }
 
-    scaleMin(g, e) {
+    scaleMin(e) {
         //e.stopPropagation();
         //event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
         var myMatrix = new Snap.Matrix();
         if (e.deltaY < 0) {
             myMatrix.scale(1.5, 1.5);
-            g.animate({transform: myMatrix}, 300);
+            this.g.animate({transform: myMatrix}, 300);
         } else {
             myMatrix.scale(0.5, 0.5);
-            g.animate({transform: myMatrix}, 300);
+            this.g.animate({transform: myMatrix}, 300);
         }
         e.preventDefault();
     }
@@ -700,6 +725,7 @@ class App{
                 console.log("Данные комнат c сервера получить не удалось.");
             });
     }
+
 }
 
 let app = new App();

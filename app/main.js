@@ -31,6 +31,7 @@ class App{
                 console.log("Данные комнат c сервера получить не удалось.");
             });
     }
+
 }
 
 let app = new App();
