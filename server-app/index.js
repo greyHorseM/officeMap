@@ -24,7 +24,8 @@ app
   .get('/rooms', function (req, res) {
     res.send([
       {
-        id: 'room1',
+        id: 1,
+        type: 'room',
         coords: {
           leftTop: {
             x: 0,
@@ -40,7 +41,8 @@ app
         svgObj: {}
       },
       {
-        id: 'room2',
+        id: 2,
+        type: 'room',
         coords: {
           leftTop: {
             x: 405,
@@ -51,12 +53,13 @@ app
             y: 400
           }
         },
-        workPlaces: [1, 2],
+        workPlaces: [3, 4],
         name: 'Vtoraya komnata',
         svgObj: {}
       },
       {
-        id: 'room3',
+        id: 3,
+        type: 'room',
         coords: {
           leftTop: {
             x: 810,
@@ -67,7 +70,7 @@ app
             y: 400
           }
         },
-        workPlaces: [1, 2],
+        workPlaces: [5, 6],
         name: 'Tretiya komnata',
         svgObj: {}
       }
@@ -76,7 +79,7 @@ app
     res.send([
         {
           id: 1,
-          type: "workplace",
+          type: 'workplace',
           coords: {
             leftTop: {
             x: 0,
@@ -88,7 +91,7 @@ app
         },
         {
           id: 2,
-          type: "workplace",
+          type: 'workplace',
           coords: {
             leftTop: {
               x: 100,

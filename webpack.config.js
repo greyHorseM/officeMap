@@ -1,13 +1,15 @@
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const path = require('path');
 
+const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+
 module.exports = {
     entry: {
-        app: './app/main'
+        app: capitalizeFirstLetter(path.join(__dirname, './app/main'))
     },
 
     output: {
-        path: './public',  // FS-путь к статике
+        path: capitalizeFirstLetter(path.join(__dirname,'./public')),  // FS-путь к статике
         publicPath: '/', // Web-путь к статике (CDN?)
         filename: 'app.js'
     },

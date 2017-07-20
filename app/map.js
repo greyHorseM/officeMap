@@ -40,32 +40,31 @@ export default class Map {
                     this.createWorkplace(this.rooms, this.s);
                 }
             );
-
-            var buttonScaleMin = document.getElementById('scale-min');
-            buttonScaleMin.addEventListener('click', () => {
-                this.scaleMin(g);
-            });
     }
 
     renderWorkPlaces(){
         for (let workPlace of this.dataWorkPlaces){
             var newWorkPlace = this.s.rect(workPlace.coords.leftTop.x, workPlace.coords.leftTop.y, 50, 50).attr({
                 stroke: '#123456',
-                fill: '#123456'
+                fill: '#123456',
+                id: workPlace.id,
+                type: workPlace.type,
+                roomId: workPlace.roomId
             });
             newWorkPlace.drag();
-            console.log(""+workPlace.id+" rendered");
+            console.log("" + workPlace.id + " rendered");
         }
     }
 
     createFigure() {
-        return ({id, workPlaces, coords}) => {
+        return ({id, type, workPlaces, coords}) => {
             var {leftTop, rightDown} = coords;
             return this.s.rect(leftTop.x, leftTop.y, rightDown.x, rightDown.y).attr({
                 stroke: '#123456',
                 strokeWidth: 5,
                 fill: '#b1c9ed',
                 id,
+                type,
                 check: false,
                 workPlaces
             });
@@ -79,25 +78,29 @@ export default class Map {
      * @param {string} idRoom
      */
     selectRoom(e) {
-        var idRoom = e.target.id;
+        let idRoom;
+
+        let typeCheckedElem = e.target.getAttribute("type");
+        console.log("typeCheckedElem ");
+        console.log(typeCheckedElem);
+        if (typeCheckedElem == "workplace"){
+            console.log(e.target.getAttribute('roomId'));
+            idRoom = e.target.getAttribute('roomId');
+        } else {
+            console.log(e.target.getAttribute("id"));
+            idRoom = e.target.getAttribute("id");
+        }
         this.idRoom = idRoom;
         var buttonCreateWorkplace = document.getElementById('create-workplace');
-        buttonCreateWorkplace.disabled = false;
-        console.log('this.rooms[idRoom]')
-        console.log(this.rooms[idRoom]);
-        if (this.rooms[idRoom].attr('check') == 'false') {
+        if (this.rooms['room'+idRoom].attr('check') == 'false') {
             for (var key in this.rooms) {
                 this.rooms[key].attr({'fill': '#b1c9ed', 'check': false});
             }
-            this.rooms[idRoom].attr({
+            this.rooms['room'+idRoom].attr({
                 'fill': '#b1edc9',
                 'check': true
             });
         }
-
-        console.log(idRoom);
-        console.log(this.rooms[idRoom].attr('fill'));
-        console.log(this.rooms[idRoom].attr('check'));
     }
 
     //Создать рабочее место в комнате
@@ -149,7 +152,7 @@ export default class Map {
     //промис для получения рабочих мест
     getWorkPlaces(){
         return fetch('/workplaces')
-            .then(data => data.json(), function(){console.log("Данные рабочих мест получить не уадлось");})
+            .then(data => data.json(), function(){console.log("Данные рабочих мест получить не удалось");})
     }
 
     //масштабирование карты

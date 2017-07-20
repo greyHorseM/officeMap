@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -32,9 +32,6 @@
 /******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
 /******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
@@ -63,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -71,280 +68,46 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-    //отвязать события от рабочих мест, привязать события выбора комнаты только к комнате
-    //масштабирование карты, разедлить области на карту и на список сотрудников
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__users_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__map_js__ = __webpack_require__(5);
 
-class Map {
-    constructor(rooms){
-        this.rooms = rooms;
-        this.createRoom();
-        console.log("map constructor is running...");
-        this.getWorkPlaces().then((dataWorkPlaces)=>{
-            console.log(dataWorkPlaces);
-            this.dataWorkPlaces = dataWorkPlaces;
-            this.renderWorkPlaces();
+
+
+class App{
+    constructor() {
+        this.getRooms().then((dataRooms)=>{
+            this.dataRooms = dataRooms;
+            let map = new __WEBPACK_IMPORTED_MODULE_1__map_js__["a" /* default */](this.dataRooms);
+            let divMap = document.querySelector('.container');
+            divMap.append(map);
         });
-        this.selectWorkPlace = this.selectWorkPlace.bind(this);
-    }
 
-    createRoom() {
-        this.s = Snap('#svg');
-        this.rooms = this.rooms.map(this.createFigure());
-        this.g = this.s.group(...this.rooms);
-        var [room1, room2, room3] = this.rooms;
-        this.g.drag();
-        var svg = document.getElementById('svg');
-        svg.addEventListener('wheel', (e) => {
-            this.scaleMin(e);
-            });
-
-            this.rooms = {room1, room2, room3};
-            console.log("this.rooms");
-            console.log(this.rooms);
-
-            this.selectRoom = this.selectRoom.bind(this);
-
-            document.querySelector('#svg').addEventListener('click', (e) => {
-                this.selectRoom(e);
-            });
-
-            var buttonCreateWorkplace = document.getElementById('create-workplace');
-            buttonCreateWorkplace.addEventListener('click', (e) => {
-                    this.createWorkplace(this.rooms, this.s);
-                }
-            );
-
-            var buttonScaleMin = document.getElementById('scale-min');
-            buttonScaleMin.addEventListener('click', () => {
-                this.scaleMin(g);
-            });
-    }
-
-    renderWorkPlaces(){
-        for (let workPlace of this.dataWorkPlaces){
-            var newWorkPlace = this.s.rect(workPlace.coords.leftTop.x, workPlace.coords.leftTop.y, 50, 50).attr({
-                stroke: '#123456',
-                fill: '#123456'
-            });
-            newWorkPlace.drag();
-            console.log(""+workPlace.id+" rendered");
-        }
-    }
-
-    createFigure() {
-        return ({id, workPlaces, coords}) => {
-            var {leftTop, rightDown} = coords;
-            return this.s.rect(leftTop.x, leftTop.y, rightDown.x, rightDown.y).attr({
-                stroke: '#123456',
-                strokeWidth: 5,
-                fill: '#b1c9ed',
-                id,
-                check: false,
-                workPlaces
-            });
-        };
-    }
-
-    //Выбрать комнату
-    /**
-     *
-     * @param {object} roomsArray
-     * @param {string} idRoom
-     */
-    selectRoom(e) {
-        var idRoom = e.target.id;
-        this.idRoom = idRoom;
-        var buttonCreateWorkplace = document.getElementById('create-workplace');
-        buttonCreateWorkplace.disabled = false;
-        console.log('this.rooms[idRoom]')
-        console.log(this.rooms[idRoom]);
-        if (this.rooms[idRoom].attr('check') == 'false') {
-            for (var key in this.rooms) {
-                this.rooms[key].attr({'fill': '#b1c9ed', 'check': false});
-            }
-            this.rooms[idRoom].attr({
-                'fill': '#b1edc9',
-                'check': true
-            });
-        }
-
-        console.log(idRoom);
-        console.log(this.rooms[idRoom].attr('fill'));
-        console.log(this.rooms[idRoom].attr('check'));
-    }
-
-    //Создать рабочее место в комнате
-    /**
-     *
-     * @param {object} roomsArray
-     * @param {object} svgObject
-     */
-
-    createWorkplace() {
-        var xpos = this.rooms[this.idRoom].attr('x');
-        var ypos = this.rooms[this.idRoom].attr('y');
-        console.log('x:' + xpos + ', ' + 'y:' + ypos);
-
-        //создание рабочего места и добавление в объект
-        var countRoom = this.rooms[this.idRoom].attr('workPlaces').length;
-        var newWorkPlace = this.s.rect(xpos, ypos, 50, 50).attr({
-            stroke: '#123456',
-            fill: '#123456',
-            id: 'workplace'+countRoom
+        this.getEmployees().then((dataEmployees)=>{
+        this.dataEmployees = dataEmployees;
+        let employees = new __WEBPACK_IMPORTED_MODULE_0__users_js__["a" /* default */](this.dataEmployees);
+        let divEmployees = document.querySelector('.list');
+        divEmployees.append(employees);
         });
-        //roomsArray[key].attr('workPlaces').append(newWorkPlace);
-        console.log(countRoom);
-        newWorkPlace.drag();
-        newWorkPlace.drag(function (x, y) {
-            let pos = x + 51;
-            console.log("I am " + pos);
-            if (pos > 400) {
-                newWorkPlace.undrag();
-            }
+    }
+
+    getEmployees(){
+        return fetch('/users')
+            .then(data =>data.json(), function(){
+            console.log("Данные пользователей с сервера получить не удалось.");
         });
-        var domWorkPlace = document.getElementById('workplace1');
-        domWorkPlace.addEventListener('click', function () {
-            console.log('тут нужны координаты');
-        });
-        this.addObjToGroup(newWorkPlace);
-        newWorkPlace.addEventListener('click', () => {this.selectWorkPlace(e)});
-
     }
 
-    addObjToGroup(obj){
-        this.g.group(obj);
-    }
-
-    selectWorkPlace(e){
-        selectedWorkPlace = e.target.id;
-    }
-
-    //промис для получения рабочих мест
-    getWorkPlaces(){
-        return fetch('/workplaces')
-            .then(data => data.json(), function(){console.log("Данные рабочих мест получить не уадлось");})
-    }
-
-    //масштабирование карты
-    scaleMap() {
-        var svg = document.getElementById('svg');
-        svg.addEventListener('wheel', function () {
-            svg.setAttribute('viewBox', "0 0 800 800");
-        })
-    }
-
-    scaleMin(e) {
-        //e.stopPropagation();
-        //event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
-        var myMatrix = new Snap.Matrix();
-        if (e.deltaY < 0) {
-            myMatrix.scale(1.5, 1.5);
-            this.g.animate({transform: myMatrix}, 300);
-        } else {
-            myMatrix.scale(0.5, 0.5);
-            this.g.animate({transform: myMatrix}, 300);
-        }
-        e.preventDefault();
+     getRooms(){
+        return fetch('/rooms')
+            .then(data => data.json(), function(){
+                console.log("Данные комнат c сервера получить не удалось.");
+            });
     }
 
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Map;
 
-    /*function toCenterRoom(svg, rooms, e){
-        console.log("I am func toCenterRoom");
-        var svgBounding = svg.getBBox();
-        var mapBounding = rooms.getBBox();
-        var targetBounding = e.target.getBBox();
-        var transformOriginX = targetBounding.x + targetBounding.width / 2;
-        var transformOriginY = targetBounding.y + targetBounding.height / 2;
-        svg.style.transformOrigin = (transformOriginX) + "px " + (transformOriginY) + "px";
-    }
-    */
-
-
-    /*function createMap(){
-        var s = Snap('#svg');
-        var room1 = s.rect(0,0,100,100).
-                    attr({
-                        stroke: '#123456',
-                        strokeWidth: 5,
-                        fill: 'blue',
-                        opacity: 0.2});
-
-        var room2 = s.rect(105,0,100,100).
-                    attr({
-                        stroke: '#123456',
-                        strokeWidth: 5,
-                        fill: 'blue',
-                        opacity: 0.2});
-
-
-
-        var titleR1 = Snap.parse('<title>Комната 1</title>');
-        room1.append(titleR1);
-
-        var titleR2 = Snap.parse('<title>Комната 2</title>');
-        room2.append(titleR2);
-
-
-        //
-        var move = function(dx,dy) {
-            this.attr({
-                transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
-            });
-            var coord = '' + dx + dy;
-            console.log(coord);
-
-        }
-
-        var start = function() {
-            this.data('origTransform', this.transform().local );
-        }
-        var stop = function() {
-            console.log('finished dragging');
-        }
-
-        room1.drag(move, start, stop );
-        room2.drag(move, start, stop );
-        //
-
-
-
-       /* var component = document.querySelector('#svg');
-        component.append(s);*/
-
-       //nextStep ассоциировать квадраты с элементом списка
-    /*    var arrayRoom = {
-         'employee1': room1,
-         'employee2': room2
-        };*/
-
-
-
-    /*    document.getElementById("employees").addEventListener("click", function(e){
-            if (e.target && e.target.nodeName == "LI"){
-                console.log("List item ", e.target.id.replace("post-", ""), " was clicked!");
-                //var room = arrayRoom[e.target.id];
-
-                arrayRoom[e.target.id].attr('fill', 'green');
-                //room.attr('fill', 'green');
-
-
-            }
-        });
-
-
-
-        alert(1);
-    }*/
-
-    /*function seeRoom(room1){
-        room1.click(function() {
-            this.attr('fill', 'green')
-        });
-    }*/
-
-    /*createMap();*/
+let app = new App();
 
 
 /***/ }),
@@ -689,46 +452,283 @@ function pug_rethrow(err, filename, lineno, str){
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__users_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__map_js__ = __webpack_require__(0);
+    //отвязать события от рабочих мест, привязать события выбора комнаты только к комнате
+    //масштабирование карты, разедлить области на карту и на список сотрудников
 
-
-
-class App{
-    constructor() {
-        this.getRooms().then((dataRooms)=>{
-            this.dataRooms = dataRooms;
-            let map = new __WEBPACK_IMPORTED_MODULE_1__map_js__["a" /* default */](this.dataRooms);
-            let divMap = document.querySelector('.container');
-            divMap.append(map);
+class Map {
+    constructor(rooms){
+        this.rooms = rooms;
+        this.createRoom();
+        console.log("map constructor is running...");
+        this.getWorkPlaces().then((dataWorkPlaces)=>{
+            console.log(dataWorkPlaces);
+            this.dataWorkPlaces = dataWorkPlaces;
+            this.renderWorkPlaces();
         });
-
-        this.getEmployees().then((dataEmployees)=>{
-        this.dataEmployees = dataEmployees;
-        let employees = new __WEBPACK_IMPORTED_MODULE_0__users_js__["a" /* default */](this.dataEmployees);
-        let divEmployees = document.querySelector('.list');
-        divEmployees.append(employees);
-        });
+        this.selectWorkPlace = this.selectWorkPlace.bind(this);
     }
 
-    getEmployees(){
-        return fetch('/users')
-            .then(data =>data.json(), function(){
-            console.log("Данные пользователей с сервера получить не удалось.");
-        });
-    }
-
-     getRooms(){
-        return fetch('/rooms')
-            .then(data => data.json(), function(){
-                console.log("Данные комнат c сервера получить не удалось.");
+    createRoom() {
+        this.s = Snap('#svg');
+        this.rooms = this.rooms.map(this.createFigure());
+        this.g = this.s.group(...this.rooms);
+        var [room1, room2, room3] = this.rooms;
+        this.g.drag();
+        var svg = document.getElementById('svg');
+        svg.addEventListener('wheel', (e) => {
+            this.scaleMin(e);
             });
+
+            this.rooms = {room1, room2, room3};
+            console.log("this.rooms");
+            console.log(this.rooms);
+
+            this.selectRoom = this.selectRoom.bind(this);
+
+            document.querySelector('#svg').addEventListener('click', (e) => {
+                this.selectRoom(e);
+            });
+
+            var buttonCreateWorkplace = document.getElementById('create-workplace');
+            buttonCreateWorkplace.addEventListener('click', (e) => {
+                    this.createWorkplace(this.rooms, this.s);
+                }
+            );
+    }
+
+    renderWorkPlaces(){
+        for (let workPlace of this.dataWorkPlaces){
+            var newWorkPlace = this.s.rect(workPlace.coords.leftTop.x, workPlace.coords.leftTop.y, 50, 50).attr({
+                stroke: '#123456',
+                fill: '#123456',
+                id: workPlace.id,
+                type: workPlace.type,
+                roomId: workPlace.roomId
+            });
+            newWorkPlace.drag();
+            console.log("" + workPlace.id + " rendered");
+        }
+    }
+
+    createFigure() {
+        return ({id, type, workPlaces, coords}) => {
+            var {leftTop, rightDown} = coords;
+            return this.s.rect(leftTop.x, leftTop.y, rightDown.x, rightDown.y).attr({
+                stroke: '#123456',
+                strokeWidth: 5,
+                fill: '#b1c9ed',
+                id,
+                type,
+                check: false,
+                workPlaces
+            });
+        };
+    }
+
+    //Выбрать комнату
+    /**
+     *
+     * @param {object} roomsArray
+     * @param {string} idRoom
+     */
+    selectRoom(e) {
+        let idRoom;
+
+        let typeCheckedElem = e.target.getAttribute("type");
+        console.log("typeCheckedElem ");
+        console.log(typeCheckedElem);
+        if (typeCheckedElem == "workplace"){
+            console.log(e.target.getAttribute('roomId'));
+            idRoom = e.target.getAttribute('roomId');
+        } else {
+            console.log(e.target.getAttribute("id"));
+            idRoom = e.target.getAttribute("id");
+        }
+        this.idRoom = idRoom;
+        var buttonCreateWorkplace = document.getElementById('create-workplace');
+        if (this.rooms['room'+idRoom].attr('check') == 'false') {
+            for (var key in this.rooms) {
+                this.rooms[key].attr({'fill': '#b1c9ed', 'check': false});
+            }
+            this.rooms['room'+idRoom].attr({
+                'fill': '#b1edc9',
+                'check': true
+            });
+        }
+    }
+
+    //Создать рабочее место в комнате
+    /**
+     *
+     * @param {object} roomsArray
+     * @param {object} svgObject
+     */
+
+    createWorkplace() {
+        var xpos = this.rooms[this.idRoom].attr('x');
+        var ypos = this.rooms[this.idRoom].attr('y');
+        console.log('x:' + xpos + ', ' + 'y:' + ypos);
+
+        //создание рабочего места и добавление в объект
+        var countRoom = this.rooms[this.idRoom].attr('workPlaces').length;
+        var newWorkPlace = this.s.rect(xpos, ypos, 50, 50).attr({
+            stroke: '#123456',
+            fill: '#123456',
+            id: 'workplace'+countRoom
+        });
+        //roomsArray[key].attr('workPlaces').append(newWorkPlace);
+        console.log(countRoom);
+        newWorkPlace.drag();
+        newWorkPlace.drag(function (x, y) {
+            let pos = x + 51;
+            console.log("I am " + pos);
+            if (pos > 400) {
+                newWorkPlace.undrag();
+            }
+        });
+        var domWorkPlace = document.getElementById('workplace1');
+        domWorkPlace.addEventListener('click', function () {
+            console.log('тут нужны координаты');
+        });
+        this.addObjToGroup(newWorkPlace);
+        newWorkPlace.addEventListener('click', () => {this.selectWorkPlace(e)});
+
+    }
+
+    addObjToGroup(obj){
+        this.g.group(obj);
+    }
+
+    selectWorkPlace(e){
+        selectedWorkPlace = e.target.id;
+    }
+
+    //промис для получения рабочих мест
+    getWorkPlaces(){
+        return fetch('/workplaces')
+            .then(data => data.json(), function(){console.log("Данные рабочих мест получить не удалось");})
+    }
+
+    //масштабирование карты
+    scaleMap() {
+        var svg = document.getElementById('svg');
+        svg.addEventListener('wheel', function () {
+            svg.setAttribute('viewBox', "0 0 800 800");
+        })
+    }
+
+    scaleMin(e) {
+        //e.stopPropagation();
+        //event.stopPropagation ? event.stopPropagation() : (event.cancelBubble=true);
+        var myMatrix = new Snap.Matrix();
+        if (e.deltaY < 0) {
+            myMatrix.scale(1.5, 1.5);
+            this.g.animate({transform: myMatrix}, 300);
+        } else {
+            myMatrix.scale(0.5, 0.5);
+            this.g.animate({transform: myMatrix}, 300);
+        }
+        e.preventDefault();
     }
 
 }
+/* harmony export (immutable) */ __webpack_exports__["a"] = Map;
 
-let app = new App();
+    /*function toCenterRoom(svg, rooms, e){
+        console.log("I am func toCenterRoom");
+        var svgBounding = svg.getBBox();
+        var mapBounding = rooms.getBBox();
+        var targetBounding = e.target.getBBox();
+        var transformOriginX = targetBounding.x + targetBounding.width / 2;
+        var transformOriginY = targetBounding.y + targetBounding.height / 2;
+        svg.style.transformOrigin = (transformOriginX) + "px " + (transformOriginY) + "px";
+    }
+    */
+
+
+    /*function createMap(){
+        var s = Snap('#svg');
+        var room1 = s.rect(0,0,100,100).
+                    attr({
+                        stroke: '#123456',
+                        strokeWidth: 5,
+                        fill: 'blue',
+                        opacity: 0.2});
+
+        var room2 = s.rect(105,0,100,100).
+                    attr({
+                        stroke: '#123456',
+                        strokeWidth: 5,
+                        fill: 'blue',
+                        opacity: 0.2});
+
+
+
+        var titleR1 = Snap.parse('<title>Комната 1</title>');
+        room1.append(titleR1);
+
+        var titleR2 = Snap.parse('<title>Комната 2</title>');
+        room2.append(titleR2);
+
+
+        //
+        var move = function(dx,dy) {
+            this.attr({
+                transform: this.data('origTransform') + (this.data('origTransform') ? "T" : "t") + [dx, dy]
+            });
+            var coord = '' + dx + dy;
+            console.log(coord);
+
+        }
+
+        var start = function() {
+            this.data('origTransform', this.transform().local );
+        }
+        var stop = function() {
+            console.log('finished dragging');
+        }
+
+        room1.drag(move, start, stop );
+        room2.drag(move, start, stop );
+        //
+
+
+
+       /* var component = document.querySelector('#svg');
+        component.append(s);*/
+
+       //nextStep ассоциировать квадраты с элементом списка
+    /*    var arrayRoom = {
+         'employee1': room1,
+         'employee2': room2
+        };*/
+
+
+
+    /*    document.getElementById("employees").addEventListener("click", function(e){
+            if (e.target && e.target.nodeName == "LI"){
+                console.log("List item ", e.target.id.replace("post-", ""), " was clicked!");
+                //var room = arrayRoom[e.target.id];
+
+                arrayRoom[e.target.id].attr('fill', 'green');
+                //room.attr('fill', 'green');
+
+
+            }
+        });
+
+
+
+        alert(1);
+    }*/
+
+    /*function seeRoom(room1){
+        room1.click(function() {
+            this.attr('fill', 'green')
+        });
+    }*/
+
+    /*createMap();*/
 
 
 /***/ })
