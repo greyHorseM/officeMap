@@ -18,14 +18,14 @@ export default class Map {
         this.s = Snap('#svg');
         this.rooms = this.rooms.map(this.createFigure());
         this.g = this.s.group(...this.rooms);
-        var [room1, room2, room3] = this.rooms;
+
         this.g.drag();
         var svg = document.getElementById('svg');
         svg.addEventListener('wheel', (e) => {
             this.scaleMin(e);
             });
 
-            this.rooms = {room1, room2, room3};
+
             console.log("this.rooms");
             console.log(this.rooms);
 
@@ -79,7 +79,6 @@ export default class Map {
      */
     selectRoom(e) {
         let idRoom;
-
         let typeCheckedElem = e.target.getAttribute("type");
         console.log("typeCheckedElem ");
         console.log(typeCheckedElem);
@@ -92,11 +91,11 @@ export default class Map {
         }
         this.idRoom = idRoom;
         var buttonCreateWorkplace = document.getElementById('create-workplace');
-        if (this.rooms['room'+idRoom].attr('check') == 'false') {
+        if (this.rooms[idRoom].attr('check') == 'false') {
             for (var key in this.rooms) {
                 this.rooms[key].attr({'fill': '#b1c9ed', 'check': false});
             }
-            this.rooms['room'+idRoom].attr({
+            this.rooms[idRoom].attr({
                 'fill': '#b1edc9',
                 'check': true
             });
@@ -138,7 +137,6 @@ export default class Map {
         });
         this.addObjToGroup(newWorkPlace);
         newWorkPlace.addEventListener('click', () => {this.selectWorkPlace(e)});
-
     }
 
     addObjToGroup(obj){

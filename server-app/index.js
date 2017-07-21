@@ -24,7 +24,7 @@ app
   .get('/rooms', function (req, res) {
     res.send([
       {
-        id: 1,
+        id: 0,
         type: 'room',
         coords: {
           leftTop: {
@@ -41,7 +41,7 @@ app
         svgObj: {}
       },
       {
-        id: 2,
+        id: 1,
         type: 'room',
         coords: {
           leftTop: {
@@ -58,7 +58,7 @@ app
         svgObj: {}
       },
       {
-        id: 3,
+        id: 2,
         type: 'room',
         coords: {
           leftTop: {
@@ -86,7 +86,7 @@ app
             y: 0
             }
           },
-          roomId: 1,
+          roomId: 0,
           userId: 1
         },
         {
@@ -98,7 +98,7 @@ app
               y: 100
             }
           },
-          roomId: 1,
+          roomId: 0,
           userId: 2
       }])
 })
